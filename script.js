@@ -160,10 +160,10 @@ function mountRobotScene(host){
  floor.position.y=-1.04;floor.receiveShadow=true;scene.add(floor);
  const ring=new THREE.Mesh(new THREE.TorusGeometry(.85,.012,8,64),new THREE.MeshBasicMaterial({color:new THREE.Color(model.color||'#73e7ff'),transparent:true,opacity:.45}));ring.rotation.x=Math.PI/2;ring.position.y=-.97;scene.add(ring);
  let mech=null,mixer=null,usingExternal=false,frame=0;
- const fallback=()=>{if(mech)return;mech=buildMech(model);mech.scale.setScalar(.93);scene.add(mech)};
+ const fallback=()=>{if(mech)return;mech=buildMech(model);mech.scale.setScalar(.93);scene.add(mech);host.dataset.robotStatus='fallback';console.warn('AI-Verse: external hero model failed; using procedural fallback.',host.dataset.robotId)};
  // CC0 mecha assets by Ramon Linares; animations are embedded in the GLB.
  // Use distinct industrial frames by class; fallback keeps the site usable if the asset host is offline.
- const assetUrls=['models/hero-mech.glb','https://ramonlinares.github.io/atlas-09/models/atlas-09.glb'];
+ const assetUrls=[new URL('models/hero-mech.glb',document.baseURI).href,'https://ramonlinares.github.io/atlas-09/models/atlas-09.glb'];
  const loadExternal=()=>new Promise((resolve,reject)=>{
   if(!THREE.GLTFLoader){reject(new Error('GLTFLoader unavailable'));return}
   const loader=new THREE.GLTFLoader();let assetIndex=0;
@@ -177,7 +177,7 @@ function mountRobotScene(host){
     object.scale.setScalar(1.78/size.y);
     object.position.set(-center.x*object.scale.x,-bounds.min.y*object.scale.y-.98,-center.z*object.scale.z);
     object.traverse(node=>{if(node.isMesh){node.castShadow=true;node.receiveShadow=true;if(node.material){const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>{if(mat.metalness!==undefined)mat.metalness=Math.min(1,Math.max(mat.metalness,.35));if(mat.roughness!==undefined)mat.roughness=Math.min(1,Math.max(mat.roughness,.24));});}}});
-    scene.add(object);mech=object;usingExternal=true;
+    scene.add(object);mech=object;usingExternal=true;host.dataset.robotStatus='loaded';
     if(gltf.animations&&gltf.animations.length){mixer=new THREE.AnimationMixer(object);const preferred=gltf.animations.find(a=>/idle|stand|sentinel/i.test(a.name))||gltf.animations[0];mixer.clipAction(preferred).play();}
     resolve();
    }catch(e){reject(e)}
@@ -196,10 +196,10 @@ function mountRobotScene(host){
   renderer.render(scene,camera);requestAnimationFrame(animate);
  };
  robotRenderers.set(host,{renderer,scene,camera,observer});
- loadExternal().catch(()=>{fallback();const note=host.querySelector('.robot-loading');if(note)note.textContent='PROCEDURAL FALLBACK'});
+ host.dataset.robotStatus='loading';loadExternal().catch(error=>{console.error('AI-Verse hero model load failed:',error);fallback();const note=host.querySelector('.robot-loading');if(note)note.textContent='FALLBACK MODEL';});
  requestAnimationFrame(animate);
 }
-function renderRobotScenes(root=document){if(!window.THREE)return;root.querySelectorAll('.robot-3d').forEach(mountRobotScene)}
+function renderRobotScenes(root=document){if(!window.THREE){console.error('AI-Verse: Three.js failed to load.');return}const hosts=[];if(root.matches&&root.matches('.robot-3d'))hosts.push(root);if(root.querySelectorAll)hosts.push(...root.querySelectorAll('.robot-3d'));hosts.forEach(mountRobotScene)}
 
 function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function renderEcosystem(){const container=document.getElementById('tier-container');container.innerHTML='';const tiers=[{key:'TITAN',title:'TITAN CLASS · VISUAL ARCHETYPES',badgeColor:'border-pink-500/50 bg-pink-950/30 text-pink-400'},{key:'WARRIOR',title:'WARRIOR CLASS · VISUAL ARCHETYPES',badgeColor:'border-cyan-500/50 bg-cyan-950/30 text-cyan-400'},{key:'SCOUT',title:'SCOUT CLASS · VISUAL ARCHETYPES',badgeColor:'border-amber-500/50 bg-amber-950/30 text-amber-400'}];tiers.forEach(t=>{const models=robotDatabase.filter(m=>m.tier===t.key);if(!models.length)return;const section=document.createElement('section');section.className='space-y-4';section.innerHTML=`<div class="flex flex-wrap items-center gap-3 border-b border-gray-800 pb-3"><span class="text-xs md:text-sm font-bold tracking-widest px-3 py-1 rounded border ${t.badgeColor} title-font">${t.title}</span><span class="text-xs text-gray-500 font-mono">(${models.length} catalogue entries)</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-end">${models.map(m=>`<button type="button" data-model-id="${escapeHTML(m.id)}" class="model-card text-left group border rounded-xl p-4 flex flex-col items-center cursor-pointer transition w-full" style="--model-glow:${m.color}25"><div class="w-full flex justify-center pedestal pb-3 pt-4">${generateRobotSVG(m)}</div><div class="mt-3 text-center w-full"><span class="text-[10px] text-cyan-400 font-mono font-bold uppercase tracking-wider">${escapeHTML(m.company)}</span><h4 class="title-font font-bold text-base text-white group-hover:text-cyan-300">${escapeHTML(m.name)}</h4><div class="text-xs text-gray-400 mt-2 bg-gray-950 px-3 py-2 rounded border border-gray-800/80">POWER SCORE: <span class="text-amber-300">NOT RANKED</span></div><p class="data-note mt-2">Public metadata · combat avatar is fictional</p></div></button>`).join('')}</div>`;container.appendChild(section)});container.querySelectorAll('[data-model-id]').forEach(b=>b.addEventListener('click',()=>openSpecModal(b.dataset.modelId)));renderRobotScenes(container);document.getElementById('stat-total').textContent=robotDatabase.length}
