@@ -28,4 +28,6 @@ This is a visual/demo project, not a live AI-model directory or benchmark. Score
 
 ## Files
 
-- `index.html` — complete standalone application (HTML, CSS, and JavaScript).
+- `index.html` — page structure and dialogs.
+- `style.css` — cyberpunk styling and animations.
+- `script.js` — demo model data, SVG generation, model cards, and battle simulation.
