@@ -137,6 +137,39 @@ function buildMech(model){
  addBox(group,0,.2,-.28,.42,.55,.2,dark);
  addBox(group,0,.24,-.39,.23,.32,.035,accentMat);
  for(let i=0;i<4;i++) addBox(group,0,.37-i*.09,-.41,.28,.025,.025,bright);
+
+ // Distinct silhouettes for the three seed avatars; not just different paint.
+ if(model.id==='google-gemma-3'){
+  // TITAN-like heavy industrial frame: oversized shoulder shells, reinforced hips,
+  // double-layer chest plating and twin rear power canisters.
+  for(const side of [-1,1]){
+   const pauldron=addBox(group,side*.76,.35,.015,.38,.29,.38,metal,.055);
+   pauldron.rotation.z=side*-.13;
+   addBox(group,side*.76,.36,.225,.25,.12,.045,bright,.018);
+   addBox(group,side*.76,.36,.255,.15,.035,.018,accentMat,.006);
+   addBox(group,side*.39,-.19,.23,.29,.17,.12,metal,.025);
+   addCyl(group,side*.22,.18,-.46,.075,.075,.34,bright,Math.PI/2);
+   addCyl(group,side*.22,.18,-.49,.045,.045,.36,accentMat,Math.PI/2);
+  }
+  addBox(group,0,.02,.31,.72,.14,.08,metal,.02);
+  group.scale.set(1.12,1.04,1.08);
+ } else if(model.id==='meta-llama-3'){
+  // Scout frame: narrow torso, lighter limbs, raised sensor crown and asymmetric antenna.
+  group.scale.set(.82,1.03,.9);
+  addBox(group,0,.99,.02,.28,.055,.24,metal,.018);
+  addCyl(group,.12,1.06,.035,.025,.025,.22,bright,0,0);
+  addCyl(group,.12,1.18,.035,.045,.045,.045,accentMat,0,0);
+  for(const side of [-1,1]){
+   addBox(group,side*.47,.4,-.02,.18,.12,.24,bright,.025);
+   addBox(group,side*.47,.4,.115,.12,.035,.025,accentMat,.006);
+   addCyl(group,side*.15,.25,-.46,.035,.035,.32,dark,Math.PI/2);
+  }
+  // Long, narrow sensor fins make the scout recognizably different in silhouette.
+  for(let i=0;i<3;i++){
+   const fin=addBox(group,-.15+i*.15,.42,-.47,.035,.34,.035,bright,.008);
+   fin.rotation.x=-.18;
+  }
+ }
  group.rotation.y=-.13;
  return group;
 }
@@ -165,6 +198,9 @@ function mountRobotScene(host){
  // Use distinct industrial frames by class; fallback keeps the site usable if the asset host is offline.
  const assetUrls=[new URL('models/hero-mech.glb',document.baseURI).href,'https://ramonlinares.github.io/atlas-09/models/atlas-09.glb'];
  const loadExternal=()=>new Promise((resolve,reject)=>{
+  // Only the hero avatar uses the Blender-prepared licensed GLB. The other two
+  // seed avatars deliberately use their own procedural silhouettes below.
+  if(model.id!=='openai-gpt-4o'){reject(new Error('Use distinct procedural frame for this avatar'));return}
   if(!THREE.GLTFLoader){reject(new Error('GLTFLoader unavailable'));return}
   const loader=new THREE.GLTFLoader();let assetIndex=0;
   const attemptLoad=()=>loader.load(assetUrls[assetIndex],gltf=>{
