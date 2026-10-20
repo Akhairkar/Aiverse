@@ -7,7 +7,66 @@ const robotDatabase = [
 {id:'meta-llama-3',name:'Llama',company:'Meta · public catalogue seed',version:'Llama family',tier:'SCOUT',powerScore:0,color:'#ffb86b',context:'Varies by model variant',description:'Public catalogue seed. Verify access conditions and specs with the linked model card.',heightPx:140,modelId:'meta-llama/Llama-3.3-70B-Instruct'}
 ];
 const colors=['#6de7ff','#ff5db7','#b6a0ff','#ffc078','#63f5bb'];
-function generateRobotSVG(model,scale=1){const h=(model.heightPx||160)*scale,w=h*.75,safeId=String(model.id).replace(/[^a-zA-Z0-9_-]/g,'');return `<svg width="${w}" height="${h}" viewBox="0 0 100 140" role="img" aria-label="${escapeHTML(model.name)} cinematic robot avatar" class="animate-float"><defs><linearGradient id="metal-${safeId}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c8d6e5"/><stop offset="22%" stop-color="#53677d"/><stop offset="55%" stop-color="#1c2b3c"/><stop offset="100%" stop-color="#080d16"/></linearGradient><linearGradient id="armor-${safeId}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${model.color||colors[0]}" stop-opacity=".9"/><stop offset="1" stop-color="#07101b" stop-opacity=".2"/></linearGradient></defs><path d="M27 14 L39 5 L61 5 L73 14 L82 39 L72 52 L28 52 L18 39Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}" stroke-width="1.7"/><path d="M27 23 L73 23 L68 39 L32 39Z" fill="#02060d" stroke="${model.color||colors[0]}"/><path d="M35 30 L46 30 M54 30 L65 30" stroke="${model.color||colors[0]}" stroke-width="3" stroke-linecap="round"/><path d="M18 55 L82 55 L91 91 L77 105 L23 105 L9 91Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}" stroke-width="1.6"/><path d="M30 59 L70 59 L65 82 L50 91 L35 82Z" fill="url(#armor-${safeId})" stroke="${model.color||colors[0]}"/><circle cx="50" cy="73" r="8" fill="#06101b" stroke="${model.color||colors[0]}" stroke-width="2"/><circle cx="50" cy="73" r="3" fill="${model.color||colors[0]}" class="core-pulse"/><path d="M12 58 L2 76 L9 92 L20 86 L24 69Z M88 58 L98 76 L91 92 L80 86 L76 69Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}"/><path d="M29 104 L45 104 L43 132 L27 136 L23 129Z M55 104 L71 104 L77 129 L73 136 L57 132Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}"/><path d="M28 120 L43 120 M57 120 L73 120" stroke="${model.color||colors[0]}" stroke-width="2"/></svg>`}
+function generateRobotSVG(model,scale=1){
+ const h=(model.heightPx||160)*scale,w=h*.78,safeId=String(model.id).replace(/[^a-zA-Z0-9_-]/g,'');
+ const accent=model.color||colors[0];
+ return `<svg width="${w}" height="${h}" viewBox="0 0 120 160" role="img" aria-label="${escapeHTML(model.name)} industrial sci-fi combat machine concept" class="mech-render">
+ <defs>
+  <linearGradient id="steel-${safeId}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0f4f7"/><stop offset=".12" stop-color="#788895"/><stop offset=".29" stop-color="#293847"/><stop offset=".52" stop-color="#111b27"/><stop offset=".72" stop-color="#465665"/><stop offset="1" stop-color="#080d14"/></linearGradient>
+  <linearGradient id="edge-${safeId}" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#dce8f0"/><stop offset=".28" stop-color="#536879"/><stop offset=".55" stop-color="#1c2b39"/><stop offset="1" stop-color="#080c12"/></linearGradient>
+  <linearGradient id="visor-${safeId}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#07111b"/><stop offset=".45" stop-color="${accent}"/><stop offset=".58" stop-color="#eafaff"/><stop offset=".72" stop-color="${accent}"/><stop offset="1" stop-color="#050912"/></linearGradient>
+  <linearGradient id="core-${safeId}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f4ffff"/><stop offset=".25" stop-color="${accent}"/><stop offset="1" stop-color="#12334a"/></linearGradient>
+  <filter id="shadow-${safeId}" x="-50%" y="-30%" width="200%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
+  <pattern id="micro-${safeId}" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 4L4 0" stroke="#dceaf2" stroke-opacity=".08" stroke-width=".6"/></pattern>
+ </defs>
+ <ellipse cx="60" cy="153" rx="34" ry="4" fill="#000" opacity=".7" filter="url(#shadow-${safeId})"/>
+ <!-- heavy shoulder exoskeleton -->
+ <path d="M39 42L22 40 9 52 5 70 17 82 31 72 38 60Z" fill="url(#steel-${safeId})" stroke="#8598a7" stroke-width="1.2"/>
+ <path d="M81 42L98 40 111 52 115 70 103 82 89 72 82 60Z" fill="url(#steel-${safeId})" stroke="#8598a7" stroke-width="1.2"/>
+ <path d="M13 54L28 48 31 60 19 70Z M107 54L92 48 89 60 101 70Z" fill="${accent}" opacity=".72"/>
+ <path d="M17 56L25 53M95 53L103 56" stroke="#e4edf2" stroke-opacity=".7" stroke-width="1.4"/>
+ <!-- compact armored head and recessed sensor band -->
+ <path d="M39 8L49 3 71 3 81 8 86 23 78 40 69 47 51 47 42 40 34 23Z" fill="url(#steel-${safeId})" stroke="#b2c1cb" stroke-width="1.2"/>
+ <path d="M38 19L48 14 72 14 82 19 78 29 69 34 51 34 42 29Z" fill="#03070d" stroke="#506272" stroke-width="1"/>
+ <path d="M43 22L56 20 77 22 70 27 50 28Z" fill="url(#visor-${safeId})"/>
+ <path d="M48 36L72 36 67 42 53 42Z" fill="#111c28" stroke="#6f8494" stroke-width=".8"/>
+ <path d="M53 39L60 39 60 42 53 42Z" fill="${accent}" opacity=".85"/>
+ <path d="M39 11L32 17 34 28M81 11L88 17 86 28" fill="none" stroke="#e0e9ef" stroke-opacity=".45" stroke-width="1"/>
+ <!-- neck actuators -->
+ <path d="M48 45L46 53 54 58 66 58 74 53 72 45" fill="url(#edge-${safeId})" stroke="#718391"/>
+ <path d="M53 47L53 55M60 47L60 56M67 47L67 55" stroke="#0a1119" stroke-width="2"/>
+ <!-- broad chest plates, vents and reactor -->
+ <path d="M35 53L48 49 72 49 85 53 96 79 86 101 73 112 47 112 34 101 24 79Z" fill="url(#steel-${safeId})" stroke="#8fa1ae" stroke-width="1.3"/>
+ <path d="M35 56L47 54 43 76 32 84 29 77Z M85 56L73 54 77 76 88 84 91 77Z" fill="url(#edge-${safeId})" stroke="#526575" stroke-width=".8"/>
+ <path d="M36 58L43 57 39 72 34 76Z M84 58L77 57 81 72 86 76Z" fill="${accent}" opacity=".62"/>
+ <path d="M45 57L75 57 70 72 60 78 50 72Z" fill="#07101a" stroke="#647b8d" stroke-width="1"/>
+ <path d="M49 60L71 60 68 69 60 73 52 69Z" fill="url(#core-${safeId})"/>
+ <circle cx="60" cy="65" r="2.6" fill="#fff" opacity=".95"/>
+ <path d="M39 82L50 78 70 78 81 82 76 94 60 101 44 94Z" fill="url(#edge-${safeId})" stroke="#9eafba" stroke-width=".8"/>
+ <path d="M46 84L54 82M46 88L54 86M66 82L74 84M66 86L74 88" stroke="#d0dbe3" stroke-opacity=".65" stroke-width="1"/>
+ <path d="M57 80L63 80 64 94 60 97 56 94Z" fill="${accent}" opacity=".85"/>
+ <path d="M29 79L36 84 33 94 26 89ZM91 79L84 84 87 94 94 89Z" fill="#101a26" stroke="#697d8b"/>
+ <!-- articulated arms with pistons -->
+ <path d="M17 82L29 77 35 91 31 107 21 111 15 101Z M103 82L91 77 85 91 89 107 99 111 105 101Z" fill="url(#steel-${safeId})" stroke="#788b99" stroke-width="1"/>
+ <path d="M21 86L29 85 31 94 26 98Z M99 86L91 85 89 94 94 98Z" fill="${accent}" opacity=".55"/>
+ <circle cx="25" cy="101" r="5" fill="#0b131d" stroke="#8a9ba7"/><circle cx="95" cy="101" r="5" fill="#0b131d" stroke="#8a9ba7"/>
+ <path d="M25 106L22 119 28 125 35 121 36 109Z M95 106L98 119 92 125 85 121 84 109Z" fill="url(#edge-${safeId})" stroke="#718492"/>
+ <path d="M22 115L31 113M89 113L98 115" stroke="${accent}" stroke-width="1.6"/>
+ <!-- segmented waist -->
+ <path d="M43 105L77 105 80 116 72 124 48 124 40 116Z" fill="url(#steel-${safeId})" stroke="#81929e"/>
+ <path d="M49 110L71 110 67 117 53 117Z" fill="#08101a" stroke="#4e6271"/>
+ <!-- heavy legs and magnetic boots -->
+ <path d="M43 120L57 120 55 138 49 147 34 147 31 141 36 128Z M63 120L77 120 84 128 89 141 86 147 71 147 65 138Z" fill="url(#steel-${safeId})" stroke="#899aa7" stroke-width="1.1"/>
+ <path d="M38 129L52 128 49 139 38 141Z M68 128L82 129 82 141 71 139Z" fill="url(#edge-${safeId})" stroke="#536777"/>
+ <path d="M39 132L49 131M71 131L81 132" stroke="${accent}" stroke-width="1.4"/>
+ <path d="M32 143L51 143 49 150 29 151 26 148Z M69 143L88 143 94 148 91 151 71 150Z" fill="#080d14" stroke="#91a0aa" stroke-width="1"/>
+ <path d="M30 147L48 147M73 147L90 147" stroke="#b7c5ce" stroke-opacity=".5"/>
+ <!-- fine panel seams, bolts and subtle wear -->
+ <path d="M43 56L39 66M77 56L81 66M33 96L41 101M87 96L79 101M45 124L42 135M75 124L78 135" stroke="#dce5eb" stroke-opacity=".32" stroke-width=".8"/>
+ <g fill="#d7e0e6" opacity=".75"><circle cx="31" cy="59" r="1"/><circle cx="89" cy="59" r="1"/><circle cx="35" cy="87" r="1"/><circle cx="85" cy="87" r="1"/><circle cx="45" cy="57" r="1"/><circle cx="75" cy="57" r="1"/></g>
+ <path d="M24 79L96 79 86 101 73 112 47 112 34 101Z" fill="url(#micro-${safeId})" opacity=".35"/>
+ </svg>`
+}
 function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function renderEcosystem(){const container=document.getElementById('tier-container');container.innerHTML='';const tiers=[{key:'TITAN',title:'TITAN CLASS · VISUAL ARCHETYPES',badgeColor:'border-pink-500/50 bg-pink-950/30 text-pink-400'},{key:'WARRIOR',title:'WARRIOR CLASS · VISUAL ARCHETYPES',badgeColor:'border-cyan-500/50 bg-cyan-950/30 text-cyan-400'},{key:'SCOUT',title:'SCOUT CLASS · VISUAL ARCHETYPES',badgeColor:'border-amber-500/50 bg-amber-950/30 text-amber-400'}];tiers.forEach(t=>{const models=robotDatabase.filter(m=>m.tier===t.key);if(!models.length)return;const section=document.createElement('section');section.className='space-y-4';section.innerHTML=`<div class="flex flex-wrap items-center gap-3 border-b border-gray-800 pb-3"><span class="text-xs md:text-sm font-bold tracking-widest px-3 py-1 rounded border ${t.badgeColor} title-font">${t.title}</span><span class="text-xs text-gray-500 font-mono">(${models.length} catalogue entries)</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-end">${models.map(m=>`<button type="button" data-model-id="${escapeHTML(m.id)}" class="model-card text-left group border rounded-xl p-4 flex flex-col items-center cursor-pointer transition w-full" style="--model-glow:${m.color}25"><div class="w-full flex justify-center pedestal pb-3 pt-4">${generateRobotSVG(m)}</div><div class="mt-3 text-center w-full"><span class="text-[10px] text-cyan-400 font-mono font-bold uppercase tracking-wider">${escapeHTML(m.company)}</span><h4 class="title-font font-bold text-base text-white group-hover:text-cyan-300">${escapeHTML(m.name)}</h4><div class="text-xs text-gray-400 mt-2 bg-gray-950 px-3 py-2 rounded border border-gray-800/80">POWER SCORE: <span class="text-amber-300">NOT RANKED</span></div><p class="data-note mt-2">Public metadata · combat avatar is fictional</p></div></button>`).join('')}</div>`;container.appendChild(section)});container.querySelectorAll('[data-model-id]').forEach(b=>b.addEventListener('click',()=>openSpecModal(b.dataset.modelId)));document.getElementById('stat-total').textContent=robotDatabase.length}
 function openSpecModal(id){const m=robotDatabase.find(x=>x.id===id);if(!m)return;document.getElementById('spec-company').textContent=m.company;document.getElementById('spec-name').textContent=m.name;document.getElementById('spec-tier').textContent=m.tier+' CLASS · VISUAL ARCHETYPE';document.getElementById('spec-tier').className='inline-block px-2.5 py-0.5 text-xs font-bold rounded mt-1 bg-cyan-950 text-cyan-300 border border-cyan-500';document.getElementById('spec-power-num').textContent='Not ranked';document.getElementById('spec-power-bar').style.width='0%';document.getElementById('spec-version').textContent=m.version;document.getElementById('spec-context').textContent=m.context;document.getElementById('spec-desc').textContent=m.description;document.getElementById('spec-visual').innerHTML=generateRobotSVG(m,1.1);openModal('spec-modal')}

@@ -10,10 +10,10 @@ header{background:rgba(4,8,17,.82)!important;border-color:rgba(105,204,239,.18)!
 .model-card:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 34%,var(--model-glow,rgba(0,196,255,.15)),transparent 58%);pointer-events:none}
 .model-card:hover{border-color:#8deaff99!important;box-shadow:0 0 0 1px #7de7ff25,0 24px 60px #0009!important}
 .model-card .pedestal{width:100%;min-height:190px;background:linear-gradient(180deg,#09111e,transparent)!important;border-bottom:1px solid #7bdcff20!important;position:relative}
-.model-card svg{filter:drop-shadow(0 0 14px #48d8ff55);transform:scale(1.08)}
+.model-card .mech-render{filter:drop-shadow(0 18px 15px #000c) drop-shadow(0 0 8px #48d8ff22);transform:scale(1.12);transform-origin:bottom center}.mech-render{overflow:visible;animation:mech-idle 5s ease-in-out infinite;shape-rendering:geometricPrecision}.model-card:nth-child(2n) .mech-render{animation-delay:-2.5s}@keyframes mech-idle{0%,100%{translate:0 0}50%{translate:0 -4px}}
 #battle-ring{background:radial-gradient(ellipse at center,#17283b 0%,#080d18 65%)!important;border-color:#6de4ff4a!important;min-height:270px}
-#fighter-a-stage svg{filter:drop-shadow(0 0 18px #16cfff88)}
-#fighter-b-stage svg{filter:drop-shadow(0 0 18px #ff3b9b88)}
+#fighter-a-stage .mech-render{filter:drop-shadow(0 20px 14px #000e) drop-shadow(0 0 10px #16cfff44)}
+#fighter-b-stage .mech-render{filter:drop-shadow(0 20px 14px #000e) drop-shadow(0 0 10px #ff3b9b44)}
 #arena-modal>div,#spec-modal>div{background:linear-gradient(145deg,#0b1422,#050810)!important;border-color:#7bdcff55!important;box-shadow:0 35px 100px #000c!important}
 #combat-log{line-height:1.6}
 .pedestal{border-bottom-color:#6ee7ff50}
@@ -22,5 +22,5 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-
 .live-data-banner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:600 11px monospace;color:#a7eaff}
 .live-data-banner .dot{width:7px;height:7px;border-radius:50%;background:#52f2b4;box-shadow:0 0 12px #52f2b4}
 .data-note{color:#8ea5bb;font-size:12px;line-height:1.5}
-@media(max-width:640px){header{position:relative!important}.model-card{min-height:280px}.model-card .pedestal{min-height:165px}#battle-ring{padding:12px;gap:4px}#battle-ring svg{max-width:95px;height:auto}}
+@media(max-width:640px){header{position:relative!important}.model-card{min-height:280px}.model-card .pedestal{min-height:165px}#battle-ring{padding:12px;gap:4px}#battle-ring .mech-render{max-width:110px;height:auto}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
