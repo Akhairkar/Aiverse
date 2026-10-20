@@ -163,12 +163,11 @@ function mountRobotScene(host){
  const fallback=()=>{if(mech)return;mech=buildMech(model);mech.scale.setScalar(.93);scene.add(mech)};
  // CC0 mecha assets by Ramon Linares; animations are embedded in the GLB.
  // Use distinct industrial frames by class; fallback keeps the site usable if the asset host is offline.
- const frameByTier={TITAN:'atlas-09',WARRIOR:'ronin-04',SCOUT:'aether-02'};
- const frameName=frameByTier[model.tier]||'atlas-09';
- const assetUrl='https://ramonlinares.github.io/atlas-09/models/'+frameName+'.glb';
+ const assetUrls=['models/hero-mech.glb','https://ramonlinares.github.io/atlas-09/models/atlas-09.glb'];
  const loadExternal=()=>new Promise((resolve,reject)=>{
   if(!THREE.GLTFLoader){reject(new Error('GLTFLoader unavailable'));return}
-  new THREE.GLTFLoader().load(assetUrl,gltf=>{
+  const loader=new THREE.GLTFLoader();let assetIndex=0;
+  const attemptLoad=()=>loader.load(assetUrls[assetIndex],gltf=>{
    try{
     const object=gltf.scene;
     const bounds=new THREE.Box3().setFromObject(object);
@@ -182,7 +181,8 @@ function mountRobotScene(host){
     if(gltf.animations&&gltf.animations.length){mixer=new THREE.AnimationMixer(object);const preferred=gltf.animations.find(a=>/idle|stand|sentinel/i.test(a.name))||gltf.animations[0];mixer.clipAction(preferred).play();}
     resolve();
    }catch(e){reject(e)}
-  },undefined,reject);
+  },undefined,error=>{assetIndex++;if(assetIndex<assetUrls.length)attemptLoad();else reject(error)});
+  attemptLoad();
  });
  const resize=()=>{const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()};
  resize();const observer=new ResizeObserver(resize);observer.observe(host);
