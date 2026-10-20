@@ -89,6 +89,50 @@ function buildMech(model){
   addCyl(group,side*.19,-.43,.18,.025,.025,.25,accentMat,0,side*.16);
   for(const y of [.38,.17,-.02]) addCyl(group,side*.39,y,.305,.018,.018,.025,dark,Math.PI/2);
  }
+ // layered shin shells with machined bevels and tread blocks
+ for(const side of [-1,1]){
+  const x=side*.34;
+  const shin=addBox(group,x,-.68,.205,.235,.31,.055,bright,.025);
+  shin.rotation.z=side*.035;
+  addBox(group,x,-.73,.242,.16,.12,.025,dark,.012);
+  for(let i=0;i<3;i++) addBox(group,x,-.71-i*.045,.26,.135,.012,.012,metal,.003);
+  // boot toe cap and traction ribs
+  addBox(group,x,-.89,.365,.28,.105,.09,metal,.018);
+  for(let i=0;i<4;i++) addBox(group,x-.12+i*.08,-.984,.25,.025,.018,.18,dark,.004);
+  // braided hydraulic lines routed along the outer leg
+  const hose=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+   new THREE.Vector3(side*.47,-.32,.08),
+   new THREE.Vector3(side*.49,-.43,.12),
+   new THREE.Vector3(side*.45,-.57,.16),
+   new THREE.Vector3(side*.45,-.72,.14)
+  ]),18,.018,8,false),rubber);
+  hose.castShadow=true;group.add(hose);
+ }
+ // industrial shoulder shells and segmented forearm guards
+ for(const side of [-1,1]){
+  const outer=addBox(group,side*.68,.32,.045,.24,.24,.29,metal,.04);
+  outer.rotation.z=side*-.16;
+  addBox(group,side*.68,.32,.205,.17,.12,.035,bright,.012);
+  addBox(group,side*.68,.32,.23,.1,.035,.018,accentMat,.006);
+  for(let i=0;i<3;i++) addBox(group,side*.64,.24-i*.055,.185,.12,.018,.018,dark,.004);
+  // wrist actuator and knuckle block
+  addCyl(group,side*.64,-.42,.035,.07,.075,.14,dark,0,side*.08);
+  addBox(group,side*.64,-.48,.08,.17,.11,.17,metal,.02);
+ }
+ // helmet brow, inset optical sensor and side antenna
+ addBox(group,0,.81,.225,.34,.045,.045,bright,.01);
+ addBox(group,0,.75,.268,.24,.052,.018,dark,.006);
+ addBox(group,0,.75,.282,.16,.018,.012,accentMat,.004);
+ addCyl(group,-.25,.82,-.015,.018,.018,.22,bright,0,0);
+ addCyl(group,-.25,.94,-.015,.026,.026,.035,accentMat,0,0);
+ // rear cooling fins and cable ports
+ for(let i=0;i<5;i++){
+  const fin=addBox(group,-.22+i*.11,.34,-.405,.055,.27,.055,bright,.012);
+  fin.rotation.x=-.12;
+ }
+ for(const side of [-1,1]){
+  addCyl(group,side*.19,.06,-.405,.045,.045,.045,bright,Math.PI/2);
+ }
  // backpack reactor housing
  addBox(group,0,.2,-.28,.42,.55,.2,dark);
  addBox(group,0,.24,-.39,.23,.32,.035,accentMat);
@@ -106,7 +150,7 @@ function mountRobotScene(host){
  const camera=new THREE.PerspectiveCamera(34,1,.1,100);camera.position.set(2.25,1.25,4.6);camera.lookAt(0,-.05,0);
  const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});
  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
- renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  renderer.setClearColor(0x000000,0);host.replaceChildren(renderer.domElement);
  const ambient=new THREE.HemisphereLight(0xc7e7ff,0x10141d,1.45);scene.add(ambient);
  const key=new THREE.DirectionalLight(0xffffff,3.0);key.position.set(3,4,4);key.castShadow=true;scene.add(key);
