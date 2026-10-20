@@ -1,177 +1,21 @@
+/* AI-Verse Phase 1 — public model metadata + explicitly simulated combat.
+   Model catalogue source: Hugging Face Hub public API. No API keys required.
+   Combat outcomes remain simulations; no model inference is performed. */
 const robotDatabase = [
-      {id:'gemini-4-pro',name:'Gemini 4 Pro',company:'Google DeepMind',version:'Demo entry',tier:'TITAN',powerScore:99,color:'#ec4899',context:'Illustrative',description:'Fictionalized demo profile. Version, context and score require independent verification before being treated as factual.',heightPx:220},
-      {id:'claude-mythos',name:'Claude Mythos',company:'Anthropic',version:'Demo entry',tier:'TITAN',powerScore:98,color:'#06b6d4',context:'Illustrative',description:'Illustrative profile for the interface demo; not a verified model specification.',heightPx:215},
-      {id:'chatgpt-astra',name:'ChatGPT Astra',company:'OpenAI',version:'Demo entry',tier:'TITAN',powerScore:97,color:'#a855f7',context:'Illustrative',description:'Fictional demo label; this is not an official OpenAI model name or benchmark.',heightPx:210},
-      {id:'claude-3-5-sonnet',name:'Claude 3.5 Sonnet',company:'Anthropic',version:'Claude 3.5 Sonnet',tier:'WARRIOR',powerScore:92,color:'#3b82f6',context:'Varies by product/API',description:'Historical model entry used for interface demonstration. The score is illustrative, not a measured benchmark.',heightPx:175},
-      {id:'gpt-4o',name:'GPT-4o',company:'OpenAI',version:'GPT-4o',tier:'WARRIOR',powerScore:90,color:'#10b981',context:'Varies by product/API',description:'Model entry for demonstration. The score is not an official ranking or benchmark.',heightPx:170},
-      {id:'deepseek-v3',name:'DeepSeek V3',company:'DeepSeek AI',version:'DeepSeek-V3 family',tier:'WARRIOR',powerScore:89,color:'#14b8a6',context:'Check provider docs',description:'Model entry for demonstration; specifications can vary by release and provider.',heightPx:165},
-      {id:'llama-3-70b',name:'Llama 3.1 70B',company:'Meta AI',version:'Llama 3.1 70B',tier:'SCOUT',powerScore:82,color:'#eab308',context:'128K (provider-dependent)',description:'Open-weight model family entry. Score is illustrative and not a benchmark result.',heightPx:135},
-      {id:'gemma-2-27b',name:'Gemma 2 27B',company:'Google',version:'Gemma 2 27B',tier:'SCOUT',powerScore:78,color:'#f97316',context:'Check provider docs',description:'Model family entry for interface demonstration; score is illustrative.',heightPx:125},
-      {id:'phi-3-medium',name:'Phi-3 Medium',company:'Microsoft',version:'Phi-3 Medium',tier:'SCOUT',powerScore:74,color:'#84cc16',context:'Check provider docs',description:'Model family entry for interface demonstration; score is illustrative.',heightPx:115}
-    ];
-
-    function generateRobotSVG(model, customScale = 1) {
-      const h = model.heightPx * customScale;
-      const w = h * 0.75;
-      const glowClass = model.tier === 'TITAN' ? 'robot-titan' : (model.tier === 'WARRIOR' ? 'robot-warrior' : 'robot-scout');
-      const safeId = model.id.replace(/[^a-zA-Z0-9_-]/g, '');
-      return `
-        <svg width="${w}" height="${h}" viewBox="0 0 100 140" role="img" aria-label="${model.name} robot illustration" class="animate-float ${glowClass}">
-          <defs><linearGradient id="metal-${safeId}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4b5563"/><stop offset="50%" stop-color="#1f2937"/><stop offset="100%" stop-color="#0f172a"/></linearGradient></defs>
-          <rect x="22" y="8" width="5" height="18" rx="2" fill="${model.color}"/><rect x="73" y="8" width="5" height="18" rx="2" fill="${model.color}"/>
-          <circle cx="24.5" cy="7" r="3" fill="${model.color}" class="core-pulse"/><circle cx="75.5" cy="7" r="3" fill="${model.color}" class="core-pulse"/>
-          <path d="M18,22 L82,22 L90,52 L10,52 Z" fill="url(#metal-${safeId})" stroke="${model.color}" stroke-width="1.8"/>
-          <rect x="25" y="30" width="50" height="12" rx="3" fill="#030712" stroke="${model.color}" stroke-width="1.2"/><circle cx="50" cy="36" r="3.5" fill="${model.color}" class="core-pulse"/>
-          <path d="M12,56 L88,56 L95,100 L5,100 Z" fill="url(#metal-${safeId})" stroke="${model.color}" stroke-width="1.8"/><circle cx="50" cy="78" r="13" fill="#030712" stroke="${model.color}" stroke-width="2"/><polygon points="50,68 59,82 41,82" fill="${model.color}" class="core-pulse"/>
-          <rect x="0" y="56" width="10" height="28" rx="3" fill="url(#metal-${safeId})" stroke="${model.color}"/><rect x="90" y="56" width="10" height="28" rx="3" fill="url(#metal-${safeId})" stroke="${model.color}"/>
-          <rect x="26" y="104" width="18" height="30" rx="2" fill="url(#metal-${safeId})" stroke="${model.color}"/><rect x="56" y="104" width="18" height="30" rx="2" fill="url(#metal-${safeId})" stroke="${model.color}"/>
-          <ellipse cx="35" cy="136" rx="7" ry="3" fill="${model.color}" class="core-pulse"/><ellipse cx="65" cy="136" rx="7" ry="3" fill="${model.color}" class="core-pulse"/>
-        </svg>`;
-    }
-
-    function renderEcosystem() {
-      const container = document.getElementById('tier-container');
-      container.innerHTML = '';
-      const tiers = [
-        {key:'TITAN',title:'👑 TITAN CLASS (S-TIER DEMO)',badgeColor:'border-pink-500/50 bg-pink-950/30 text-pink-400'},
-        {key:'WARRIOR',title:'⚔️ WARRIOR CLASS (A-TIER DEMO)',badgeColor:'border-cyan-500/50 bg-cyan-950/30 text-cyan-400'},
-        {key:'SCOUT',title:'⚡ SCOUT CLASS (B-TIER DEMO)',badgeColor:'border-amber-500/50 bg-amber-950/30 text-amber-400'}
-      ];
-      tiers.forEach(tierObj => {
-        const models = robotDatabase.filter(m => m.tier === tierObj.key);
-        if (!models.length) return;
-        const section = document.createElement('section');
-        section.className = 'space-y-4';
-        section.innerHTML = `
-          <div class="flex flex-wrap items-center gap-3 border-b border-gray-800 pb-2"><span class="text-xs md:text-sm font-bold tracking-widest px-3 py-1 rounded border ${tierObj.badgeColor} title-font">${tierObj.title}</span><span class="text-xs text-gray-500 font-mono">(${models.length} Models in demo)</span></div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
-            ${models.map(m => `
-              <button type="button" data-model-id="${m.id}" class="model-card text-left group bg-gray-900/40 border border-gray-800 hover:border-cyan-500/60 focus:border-cyan-400 rounded-xl p-4 flex flex-col items-center cursor-pointer transition transform hover:-translate-y-1.5 shadow-lg w-full">
-                <div class="w-full flex justify-center pedestal pb-3 pt-4">${generateRobotSVG(m)}</div>
-                <div class="mt-3 text-center w-full"><span class="text-[10px] text-cyan-400 font-mono font-bold uppercase tracking-wider">${m.company}</span><h4 class="title-font font-bold text-base text-white group-hover:text-cyan-300 transition">${m.name}</h4>
-                <div class="flex justify-between items-center text-xs text-gray-400 mt-2 bg-gray-950 px-3 py-1.5 rounded border border-gray-800/80"><span>Demo Score:</span><span class="font-bold text-cyan-400">${m.powerScore}/100</span></div></div>
-              </button>`).join('')}
-          </div>`;
-        container.appendChild(section);
-      });
-      container.querySelectorAll('[data-model-id]').forEach(button => button.addEventListener('click', () => openSpecModal(button.dataset.modelId)));
-      document.getElementById('stat-total').textContent = robotDatabase.length;
-    }
-
-    function openSpecModal(modelId) {
-      const m = robotDatabase.find(x => x.id === modelId);
-      if (!m) return;
-      document.getElementById('spec-company').textContent = m.company;
-      document.getElementById('spec-name').textContent = m.name;
-      document.getElementById('spec-tier').textContent = m.tier + ' CLASS';
-      document.getElementById('spec-tier').className = 'inline-block px-2.5 py-0.5 text-xs font-bold rounded mt-1 ' + (m.tier === 'TITAN' ? 'bg-pink-950 text-pink-400 border border-pink-500' : m.tier === 'SCOUT' ? 'bg-amber-950 text-amber-300 border border-amber-500' : 'bg-cyan-950 text-cyan-400 border border-cyan-500');
-      document.getElementById('spec-power-num').textContent = m.powerScore + '/100 (demo)';
-      document.getElementById('spec-power-bar').style.width = Math.max(0, Math.min(100, m.powerScore)) + '%';
-      document.getElementById('spec-version').textContent = m.version;
-      document.getElementById('spec-context').textContent = m.context;
-      document.getElementById('spec-desc').textContent = m.description;
-      document.getElementById('spec-visual').innerHTML = generateRobotSVG(m, 1.1);
-      openModal('spec-modal');
-    }
-
-    function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
-      document.body.classList.add('modal-open');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-      if (document.querySelectorAll('[role="dialog"]:not(.hidden)').length === 0) document.body.classList.remove('modal-open');
-    }
-    function openArenaModal() {
-      populateFighterSelects();
-      updateFighterDisplay('a');
-      updateFighterDisplay('b');
-      document.getElementById('combat-status').textContent = 'STANDBY';
-      openModal('arena-modal');
-    }
-    function populateFighterSelects() {
-      const selectA = document.getElementById('fighter-a-select');
-      const selectB = document.getElementById('fighter-b-select');
-      const previousA = selectA.value;
-      const previousB = selectB.value;
-      selectA.innerHTML = '';
-      selectB.innerHTML = '';
-      robotDatabase.forEach((m, idx) => {
-        const optionA = new Option('[' + m.tier + '] ' + m.name + ' (Demo score: ' + m.powerScore + ')', m.id);
-        const optionB = new Option('[' + m.tier + '] ' + m.name + ' (Demo score: ' + m.powerScore + ')', m.id);
-        selectA.add(optionA);
-        selectB.add(optionB);
-        if (m.id === previousA || (!previousA && idx === 0)) optionA.selected = true;
-        if (m.id === previousB || (!previousB && idx === 3)) optionB.selected = true;
-      });
-      if (selectA.value === selectB.value && selectB.options.length > 1) selectB.selectedIndex = 1;
-    }
-    function updateFighterDisplay(corner) {
-      const select = document.getElementById('fighter-' + corner + '-select');
-      const stage = document.getElementById('fighter-' + corner + '-stage');
-      const m = robotDatabase.find(x => x.id === select.value);
-      if (!m) { stage.textContent = 'Select a model'; return; }
-      stage.innerHTML = `${generateRobotSVG(m, 0.9)}<div class="text-center mt-2"><div class="title-font font-bold text-sm text-white">${m.name}</div><div class="text-[10px] text-gray-400 font-mono">DEMO SCORE: ${m.powerScore}</div></div>`;
-    }
-    function executeBattle() {
-      const idA = document.getElementById('fighter-a-select').value;
-      const idB = document.getElementById('fighter-b-select').value;
-      if (!idA || !idB || idA === idB) { alert('Select two different robots for combat!'); return; }
-      const fighterA = robotDatabase.find(x => x.id === idA);
-      const fighterB = robotDatabase.find(x => x.id === idB);
-      if (!fighterA || !fighterB) return;
-      const btn = document.getElementById('fight-btn');
-      const status = document.getElementById('combat-status');
-      const log = document.getElementById('combat-log');
-      const ring = document.getElementById('battle-ring');
-      btn.disabled = true;
-      btn.classList.add('opacity-50');
-      status.textContent = 'SIMULATING MATCH...';
-      ring.classList.add('animate-shake');
-      log.replaceChildren();
-      const firstLine = document.createElement('p');
-      firstLine.className = 'text-cyan-400';
-      firstLine.textContent = '> Starting demo matchup: ' + fighterA.name + ' vs ' + fighterB.name + '...';
-      log.appendChild(firstLine);
-      setTimeout(() => {
-        const diff = fighterA.powerScore - fighterB.powerScore;
-        const winner = diff >= 0 ? fighterA : fighterB;
-        const loser = diff >= 0 ? fighterB : fighterA;
-        const absDiff = Math.abs(diff);
-        const durationSec = absDiff > 15 ? (1.5 + Math.random()).toFixed(2) : (4 + Math.random() * 3).toFixed(2);
-        ring.classList.remove('animate-shake');
-        btn.disabled = false;
-        btn.classList.remove('opacity-50');
-        status.textContent = 'DEMO MATCH CONCLUDED';
-        const lines = [
-          ['text-yellow-400','> Comparing illustrative demo scores...'],
-          ['text-pink-400','> ' + winner.name + ' wins this scripted score comparison over ' + loser.name + '.'],
-          ['text-green-400 font-bold','> SIMULATION COMPLETE in ' + durationSec + ' seconds.'],
-          ['text-white font-bold bg-gray-900 p-1 rounded border border-gray-800 mt-1','> DEMO WINNER: ' + winner.name + ' (' + winner.tier + ') — score gap: ' + absDiff + ' points.']
-        ];
-        lines.forEach(([className, message]) => { const p = document.createElement('p'); p.className = className; p.textContent = message; log.appendChild(p); });
-        log.scrollTop = log.scrollHeight;
-      }, 1200);
-    }
-    function triggerAutoUpdate() {
-      const icon = document.getElementById('sync-icon');
-      icon.classList.add('animate-spin');
-      setTimeout(() => {
-        icon.classList.remove('animate-spin');
-        if (!robotDatabase.find(m => m.id === 'mythos-v5-demo')) {
-          robotDatabase.unshift({id:'mythos-v5-demo',name:'Mythos V5 (Fictional Demo)',company:'Demo entry — not verified',version:'Fictional demo',tier:'TITAN',powerScore:100,color:'#f43f5e',context:'Not verified',description:'Fictional placeholder inserted to demonstrate the UI update interaction. This is not a claim that such a model exists or was discovered automatically.',heightPx:230});
-          renderEcosystem();
-          populateFighterSelects();
-          alert('Demo entry added. No live model scan was performed.');
-        } else {
-          alert('Demo is up to date. No live model scan was performed.');
-        }
-      }, 800);
-    }
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        ['spec-modal','arena-modal'].forEach(id => { if (!document.getElementById(id).classList.contains('hidden')) closeModal(id); });
-      }
-    });
-    document.querySelectorAll('[role="dialog"]').forEach(modal => modal.addEventListener('click', event => { if (event.target === modal) closeModal(modal.id); }));
-    renderEcosystem();
+{id:'openai-gpt-4o',name:'GPT-4o',company:'OpenAI · public catalogue seed',version:'GPT-4o',tier:'TITAN',powerScore:0,color:'#66e6ff',context:'See provider documentation',description:'Public catalogue seed. The score is not a benchmark; model availability and specs can change.',heightPx:220,modelId:'openai/gpt-4o'},
+{id:'google-gemma-3',name:'Gemma 3',company:'Google · public catalogue seed',version:'Gemma 3 family',tier:'WARRIOR',powerScore:0,color:'#a78bfa',context:'Varies by model variant',description:'Public catalogue seed. Verify specifications with the linked model card.',heightPx:175,modelId:'google/gemma-3-4b-it'},
+{id:'meta-llama-3',name:'Llama',company:'Meta · public catalogue seed',version:'Llama family',tier:'SCOUT',powerScore:0,color:'#ffb86b',context:'Varies by model variant',description:'Public catalogue seed. Verify access conditions and specs with the linked model card.',heightPx:140,modelId:'meta-llama/Llama-3.3-70B-Instruct'}
+];
+const colors=['#6de7ff','#ff5db7','#b6a0ff','#ffc078','#63f5bb'];
+function generateRobotSVG(model,scale=1){const h=(model.heightPx||160)*scale,w=h*.75,safeId=String(model.id).replace(/[^a-zA-Z0-9_-]/g,'');return `<svg width="${w}" height="${h}" viewBox="0 0 100 140" role="img" aria-label="${escapeHTML(model.name)} cinematic robot avatar" class="animate-float"><defs><linearGradient id="metal-${safeId}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c8d6e5"/><stop offset="22%" stop-color="#53677d"/><stop offset="55%" stop-color="#1c2b3c"/><stop offset="100%" stop-color="#080d16"/></linearGradient><linearGradient id="armor-${safeId}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${model.color||colors[0]}" stop-opacity=".9"/><stop offset="1" stop-color="#07101b" stop-opacity=".2"/></linearGradient></defs><path d="M27 14 L39 5 L61 5 L73 14 L82 39 L72 52 L28 52 L18 39Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}" stroke-width="1.7"/><path d="M27 23 L73 23 L68 39 L32 39Z" fill="#02060d" stroke="${model.color||colors[0]}"/><path d="M35 30 L46 30 M54 30 L65 30" stroke="${model.color||colors[0]}" stroke-width="3" stroke-linecap="round"/><path d="M18 55 L82 55 L91 91 L77 105 L23 105 L9 91Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}" stroke-width="1.6"/><path d="M30 59 L70 59 L65 82 L50 91 L35 82Z" fill="url(#armor-${safeId})" stroke="${model.color||colors[0]}"/><circle cx="50" cy="73" r="8" fill="#06101b" stroke="${model.color||colors[0]}" stroke-width="2"/><circle cx="50" cy="73" r="3" fill="${model.color||colors[0]}" class="core-pulse"/><path d="M12 58 L2 76 L9 92 L20 86 L24 69Z M88 58 L98 76 L91 92 L80 86 L76 69Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}"/><path d="M29 104 L45 104 L43 132 L27 136 L23 129Z M55 104 L71 104 L77 129 L73 136 L57 132Z" fill="url(#metal-${safeId})" stroke="${model.color||colors[0]}"/><path d="M28 120 L43 120 M57 120 L73 120" stroke="${model.color||colors[0]}" stroke-width="2"/></svg>`}
+function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderEcosystem(){const container=document.getElementById('tier-container');container.innerHTML='';const tiers=[{key:'TITAN',title:'TITAN CLASS · VISUAL ARCHETYPES',badgeColor:'border-pink-500/50 bg-pink-950/30 text-pink-400'},{key:'WARRIOR',title:'WARRIOR CLASS · VISUAL ARCHETYPES',badgeColor:'border-cyan-500/50 bg-cyan-950/30 text-cyan-400'},{key:'SCOUT',title:'SCOUT CLASS · VISUAL ARCHETYPES',badgeColor:'border-amber-500/50 bg-amber-950/30 text-amber-400'}];tiers.forEach(t=>{const models=robotDatabase.filter(m=>m.tier===t.key);if(!models.length)return;const section=document.createElement('section');section.className='space-y-4';section.innerHTML=`<div class="flex flex-wrap items-center gap-3 border-b border-gray-800 pb-3"><span class="text-xs md:text-sm font-bold tracking-widest px-3 py-1 rounded border ${t.badgeColor} title-font">${t.title}</span><span class="text-xs text-gray-500 font-mono">(${models.length} catalogue entries)</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-end">${models.map(m=>`<button type="button" data-model-id="${escapeHTML(m.id)}" class="model-card text-left group border rounded-xl p-4 flex flex-col items-center cursor-pointer transition w-full" style="--model-glow:${m.color}25"><div class="w-full flex justify-center pedestal pb-3 pt-4">${generateRobotSVG(m)}</div><div class="mt-3 text-center w-full"><span class="text-[10px] text-cyan-400 font-mono font-bold uppercase tracking-wider">${escapeHTML(m.company)}</span><h4 class="title-font font-bold text-base text-white group-hover:text-cyan-300">${escapeHTML(m.name)}</h4><div class="text-xs text-gray-400 mt-2 bg-gray-950 px-3 py-2 rounded border border-gray-800/80">POWER SCORE: <span class="text-amber-300">NOT RANKED</span></div><p class="data-note mt-2">Public metadata · combat avatar is fictional</p></div></button>`).join('')}</div>`;container.appendChild(section)});container.querySelectorAll('[data-model-id]').forEach(b=>b.addEventListener('click',()=>openSpecModal(b.dataset.modelId)));document.getElementById('stat-total').textContent=robotDatabase.length}
+function openSpecModal(id){const m=robotDatabase.find(x=>x.id===id);if(!m)return;document.getElementById('spec-company').textContent=m.company;document.getElementById('spec-name').textContent=m.name;document.getElementById('spec-tier').textContent=m.tier+' CLASS · VISUAL ARCHETYPE';document.getElementById('spec-tier').className='inline-block px-2.5 py-0.5 text-xs font-bold rounded mt-1 bg-cyan-950 text-cyan-300 border border-cyan-500';document.getElementById('spec-power-num').textContent='Not ranked';document.getElementById('spec-power-bar').style.width='0%';document.getElementById('spec-version').textContent=m.version;document.getElementById('spec-context').textContent=m.context;document.getElementById('spec-desc').textContent=m.description;document.getElementById('spec-visual').innerHTML=generateRobotSVG(m,1.1);openModal('spec-modal')}
+function openModal(id){document.getElementById(id).classList.remove('hidden');document.body.classList.add('modal-open')}
+function closeModal(id){document.getElementById(id).classList.add('hidden');if(!document.querySelector('[role="dialog"]:not(.hidden)'))document.body.classList.remove('modal-open')}
+function openArenaModal(){populateFighterSelects();updateFighterDisplay('a');updateFighterDisplay('b');document.getElementById('combat-status').textContent='SIMULATION STANDBY';openModal('arena-modal')}
+function populateFighterSelects(){const a=document.getElementById('fighter-a-select'),b=document.getElementById('fighter-b-select'),pa=a.value,pb=b.value;a.innerHTML='';b.innerHTML='';robotDatabase.forEach((m,i)=>{a.add(new Option(m.name+' · simulated avatar',m.id));b.add(new Option(m.name+' · simulated avatar',m.id));if(m.id===pa||(!pa&&i===0))a.options[a.options.length-1].selected=true;if(m.id===pb||(!pb&&i===1))b.options[b.options.length-1].selected=true});if(a.value===b.value&&b.options.length>1)b.selectedIndex=1}
+function updateFighterDisplay(c){const sel=document.getElementById('fighter-'+c+'-select'),stage=document.getElementById('fighter-'+c+'-stage'),m=robotDatabase.find(x=>x.id===sel.value);if(!m){stage.textContent='Select a model';return}stage.innerHTML=generateRobotSVG(m,.85)+'<div class="text-center mt-2"><div class="title-font font-bold text-sm text-white">'+escapeHTML(m.name)+'</div><div class="text-[10px] text-gray-400 font-mono">SIMULATED AVATAR</div></div>'}
+function executeBattle(){const a=robotDatabase.find(m=>m.id===document.getElementById('fighter-a-select').value),b=robotDatabase.find(m=>m.id===document.getElementById('fighter-b-select').value);if(!a||!b||a.id===b.id){alert('Choose two different AI avatars.');return}const btn=document.getElementById('fight-btn'),status=document.getElementById('combat-status'),log=document.getElementById('combat-log'),ring=document.getElementById('battle-ring');btn.disabled=true;status.textContent='SIMULATED COMBAT IN PROGRESS';ring.classList.add('animate-shake');log.replaceChildren();const messages=['Arena initialized. No AI model APIs are called in Phase 1.','Combat choreography running…','Evaluating fictional avatar attributes for entertainment only.'];messages.forEach((s,i)=>setTimeout(()=>{const p=document.createElement('p');p.className=i===2?'text-pink-300':'text-cyan-300';p.textContent='> '+s;log.appendChild(p)},i*500));setTimeout(()=>{const winner=Math.random()<.5?a:b;ring.classList.remove('animate-shake');btn.disabled=false;status.textContent='SIMULATION COMPLETE · NOT A REAL AI RESULT';const p=document.createElement('p');p.className='text-yellow-300 font-bold';p.textContent='> SIMULATED WINNER: '+winner.name+' — randomly selected for this visual demo. No real model was tested.';log.appendChild(p);const q=document.createElement('p');q.className='text-gray-400';q.textContent='> Real AI battles will require secure backend integration and actual model inference.';log.appendChild(q);log.scrollTop=log.scrollHeight},1900)}
+async function triggerAutoUpdate(){const icon=document.getElementById('sync-icon');icon.classList.add('animate-spin');try{const response=await fetch('https://huggingface.co/api/models?pipeline_tag=text-generation&sort=downloads&direction=-1&limit=12',{headers:{Accept:'application/json'}});if(!response.ok)throw new Error('Public model catalogue returned HTTP '+response.status);const data=await response.json();if(!Array.isArray(data))throw new Error('Unexpected public catalogue response');const existing=new Set(robotDatabase.map(m=>m.modelId));let added=0;data.forEach((item,i)=>{if(!item.id||existing.has(item.id)||robotDatabase.length>=15)return;const id='hf-'+item.id.toLowerCase().replace(/[^a-z0-9-]/g,'-');robotDatabase.push({id,name:item.id.split('/').pop(),company:'Hugging Face public catalogue · '+(item.author||item.id.split('/')[0]),version:item.sha?String(item.sha).slice(0,8):'See model card',tier:i<4?'TITAN':i<8?'WARRIOR':'SCOUT',powerScore:0,color:colors[i%colors.length],context:'See public model card',description:'Retrieved from Hugging Face public model catalogue. Downloads are not a quality score; capabilities and access conditions vary. Open the model card for details.',heightPx:125+(i%4)*18,modelId:item.id,downloads:item.downloads??null,likes:item.likes??null,modelUrl:'https://huggingface.co/'+item.id});existing.add(item.id);added++});renderEcosystem();populateFighterSelects();const note=document.getElementById('catalogue-status');if(note)note.textContent='Public catalogue refreshed '+new Date().toLocaleString()+' · '+added+' new entries added. Downloads/likes are popularity signals, not quality rankings.';else alert('Public model catalogue refreshed. '+added+' new entries added. Popularity metrics are not quality rankings.');}catch(err){alert('Could not refresh public model data: '+err.message+'. Existing catalogue remains available.')}finally{icon.classList.remove('animate-spin')}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['spec-modal','arena-modal'].forEach(id=>{if(!document.getElementById(id).classList.contains('hidden'))closeModal(id)})});document.querySelectorAll('[role="dialog"]').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));renderEcosystem();

@@ -1,84 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#030712">
-  <meta name="description" content="AI-Verse is a cyberpunk-themed interactive demo for browsing fictional robot classes and simulating model matchups.">
-  <title>AI-VERSE // Robot Evolution &amp; Battle Arena</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#050812">
+<meta name="description" content="Explore AI models through public catalogue data and a cinematic, explicitly simulated robot battle arena.">
+<title>AI-VERSE | Cinematic AI Frontier</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-grid min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
-  <header class="border-b border-cyan-900/50 bg-gray-950/90 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
-    <div class="flex items-center gap-3">
-      <div class="w-3.5 h-3.5 bg-cyan-400 rounded-full animate-ping" aria-hidden="true"></div>
-      <h1 class="title-font text-xl md:text-2xl font-black tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-300 bg-clip-text text-transparent">AI-VERSE // ROBOT INDEX</h1>
-    </div>
-    <div class="flex flex-wrap gap-3 items-center">
-      <button type="button" onclick="openArenaModal()" class="bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white border border-pink-400/50 px-4 py-2 rounded-lg text-xs md:text-sm font-bold tracking-wider uppercase transition shadow-lg shadow-pink-950/50 flex items-center gap-2">⚔️ Enter Battle Arena</button>
-      <button type="button" onclick="triggerAutoUpdate()" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold transition flex items-center gap-2"><span id="sync-icon" aria-hidden="true">🔄</span> Auto-Scan (Demo)</button>
-    </div>
-  </header>
-
-  <main class="container mx-auto px-4 py-6 flex-1 space-y-10">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-900/60 border border-cyan-900/40 p-4 rounded-xl gap-4">
-      <div>
-        <h2 class="title-font text-lg text-cyan-300 font-bold">AUTONOMOUS MODEL EVOLUTION TRACKER</h2>
-        <p class="text-xs text-gray-400">Illustrative demo scores and model details — not verified benchmarks or live model discovery.</p>
-      </div>
-      <div class="flex gap-4 text-xs font-mono"><div class="bg-gray-950 px-3 py-1.5 rounded border border-gray-800"><span class="text-gray-500">TOTAL ROBOTS:</span> <span id="stat-total" class="text-cyan-400 font-bold">0</span></div></div>
-    </div>
-    <div id="tier-container" class="space-y-12"></div>
-  </main>
-
-  <div id="spec-modal" role="dialog" aria-modal="true" aria-labelledby="spec-name" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-cyan-500/50 rounded-2xl max-w-2xl w-full p-6 relative shadow-2xl shadow-cyan-950/80 max-h-[90vh] overflow-y-auto">
-      <button type="button" onclick="closeModal('spec-modal')" aria-label="Close model details" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">✕</button>
-      <div class="flex flex-col md:flex-row gap-6">
-        <div id="spec-visual" class="w-full md:w-1/2 bg-gray-950 rounded-xl border border-cyan-900/50 p-6 flex flex-col items-center justify-center pedestal"></div>
-        <div class="w-full md:w-1/2 flex flex-col justify-between space-y-4"><div>
-          <div id="spec-company" class="text-xs text-cyan-400 font-bold tracking-widest uppercase">COMPANY</div>
-          <h3 id="spec-name" class="title-font text-2xl font-black text-white">NAME</h3>
-          <span id="spec-tier" class="inline-block px-2.5 py-0.5 text-xs font-bold rounded mt-1">TIER</span>
-          <div class="space-y-3 mt-4 text-xs">
-            <div><div class="flex justify-between text-gray-400 mb-1 font-semibold"><span>POWER / DEMO INDEX</span><span id="spec-power-num" class="text-cyan-300">0%</span></div><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div id="spec-power-bar" class="bg-cyan-400 h-full transition-all duration-500"></div></div></div>
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-800">
-              <div class="bg-gray-950 p-2 rounded border border-gray-800"><span class="text-gray-500 block text-[10px]">VERSION ID</span><span id="spec-version" class="text-gray-200 font-bold">-</span></div>
-              <div class="bg-gray-950 p-2 rounded border border-gray-800"><span class="text-gray-500 block text-[10px]">CONTEXT WINDOW</span><span id="spec-context" class="text-gray-200 font-bold">-</span></div>
-            </div>
-            <div class="bg-gray-950 p-3 rounded border border-gray-800"><span class="text-cyan-400 font-bold block mb-1">CAPABILITIES LOG:</span><p id="spec-desc" class="text-gray-300 leading-relaxed">-</p></div>
-          </div>
-        </div><button type="button" onclick="closeModal('spec-modal')" class="w-full bg-cyan-600 hover:bg-cyan-500 text-black font-extrabold py-2 rounded text-xs title-font uppercase tracking-wider transition">CLOSE TELEMETRY</button></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="arena-modal" role="dialog" aria-modal="true" aria-labelledby="arena-title" class="fixed inset-0 bg-black/90 backdrop-blur-lg hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-gray-950 border border-fuchsia-500/50 rounded-2xl max-w-4xl w-full p-6 relative shadow-2xl shadow-pink-950/60 max-h-[92vh] overflow-y-auto flex flex-col justify-between">
-      <button type="button" onclick="closeModal('arena-modal')" aria-label="Close battle arena" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-10">✕</button>
-      <div class="text-center mb-4"><h3 id="arena-title" class="title-font text-2xl font-black text-fuchsia-400 tracking-wider">⚔️ CYBERNETIC DUEL ARENA</h3><p class="text-xs text-gray-400">A scripted matchup demo. Winner is determined by the illustrative demo score.</p></div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="bg-gray-900 p-3 rounded-lg border border-cyan-900"><label for="fighter-a-select" class="block text-xs text-cyan-400 font-bold mb-1">CHALLENGER A (BLUE CORNER)</label><select id="fighter-a-select" onchange="updateFighterDisplay('a')" class="w-full bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500"></select></div>
-        <div class="bg-gray-900 p-3 rounded-lg border border-pink-900"><label for="fighter-b-select" class="block text-xs text-pink-400 font-bold mb-1">CHALLENGER B (RED CORNER)</label><select id="fighter-b-select" onchange="updateFighterDisplay('b')" class="w-full bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-pink-500"></select></div>
-      </div>
-      <div id="battle-ring" class="relative bg-gray-900/80 border border-cyan-900/60 rounded-xl p-6 min-h-[220px] flex items-center justify-between pedestal mb-6 overflow-hidden">
-        <div id="fighter-a-stage" class="flex flex-col items-center transition-all duration-300"></div>
-        <div class="flex flex-col items-center"><div class="text-3xl font-black title-font text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500 animate-pulse">VS</div><div id="combat-status" class="text-[10px] text-gray-400 mt-2 font-mono">STANDBY</div></div>
-        <div id="fighter-b-stage" class="flex flex-col items-center transition-all duration-300"></div>
-      </div>
-      <div class="space-y-4">
-        <button id="fight-btn" type="button" onclick="executeBattle()" class="w-full bg-gradient-to-r from-fuchsia-600 via-pink-600 to-amber-500 hover:from-fuchsia-500 hover:to-amber-400 text-white font-black py-3 rounded-xl title-font tracking-widest text-sm shadow-lg shadow-fuchsia-950/80 transition">START DUEL SIMULATION</button>
-        <div class="bg-gray-900 p-3 rounded-lg border border-gray-800"><div class="text-[10px] text-cyan-400 font-bold tracking-widest mb-1">COMBAT LOG &amp; KNOCKOUT ANALYSIS:</div><div id="combat-log" aria-live="polite" class="text-xs font-mono text-gray-300 h-24 overflow-y-auto space-y-1 bg-gray-950 p-2.5 rounded border border-gray-900"><p class="text-gray-500 italic">&gt; Select fighters and launch simulation...</p></div></div>
-      </div>
-    </div>
-  </div>
-
-  <footer class="border-t border-cyan-900/30 py-4 px-4 text-center text-xs text-gray-500">AI-Verse Cybernetic Model Index // Autonomous Web Architecture · Interactive demo only</footer>
-
-  <script src="script.js" defer></script>
-</body>
-</html>
+<body class="bg-grid min-h-screen flex flex-col selection:bg-cyan-400 selection:text-black">
+<header class="border-b px-4 md:px-8 py-4 flex flex-wrap justify-between items-center gap-4 sticky top-0 z-40">
+<div class="flex items-center gap-3"><div class="w-3 h-3 rounded-full bg-cyan-300 core-pulse"></div><div><h1 class="title-font text-xl md:text-2xl font-black bg-gradient-to-r from-cyan-300 via-white to-fuchsia-300 bg-clip-text text-transparent">AI-VERSE</h1><p class="text-[10px] tracking-[.3em] text-gray-400">THE CINEMATIC AI FRONTIER</p></div></div>
+<div class="flex flex-wrap gap-2 items-center"><button type="button" onclick="openArenaModal()" class="bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider">⚔ Enter Battle Arena</button><button type="button" onclick="triggerAutoUpdate()" class="bg-cyan-950 text-cyan-200 border border-cyan-500/40 px-3.5 py-2.5 rounded-lg text-xs font-bold"><span id="sync-icon">↻</span> Refresh public data</button></div>
+</header>
+<main class="container mx-auto px-4 py-7 flex-1 space-y-8 max-w-7xl">
+<section class="relative overflow-hidden rounded-3xl border border-cyan-300/20 p-6 md:p-10 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
+<div class="absolute -right-12 -top-20 w-72 h-72 rounded-full bg-cyan-400/10 blur-3xl"></div><div class="absolute right-24 bottom-0 w-52 h-52 rounded-full bg-fuchsia-500/10 blur-3xl"></div>
+<div class="relative max-w-3xl"><div class="live-data-banner"><span class="dot"></span> PUBLIC MODEL CATALOGUE · PHASE 1 <span class="border border-amber-400/30 text-amber-300 rounded px-2 py-1">COMBAT IS SIMULATED</span></div>
+<h2 class="title-font text-3xl md:text-5xl font-black leading-tight mt-5">Where intelligence<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-fuchsia-300">enters the arena.</span></h2>
+<p class="text-gray-300 md:text-lg mt-4 max-w-2xl">Discover public AI model listings, explore their model cards, and watch cinematic robot matchups. Every simulation is labelled honestly—no fake benchmark rankings and no claim that a real AI was tested.</p>
+<div class="flex flex-wrap gap-3 mt-6"><button type="button" onclick="openArenaModal()" class="bg-white text-slate-950 px-5 py-3 rounded-lg font-bold">Launch simulated combat ↗</button><a href="https://huggingface.co/models" target="_blank" rel="noopener noreferrer" class="border border-white/20 bg-white/5 px-5 py-3 rounded-lg font-semibold text-white">Explore real model cards ↗</a></div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-8"><div class="bg-black/30 border border-white/10 rounded-xl p-4"><p class="text-[10px] tracking-widest text-gray-400">DATA SOURCE</p><p class="title-font text-sm text-cyan-200 mt-1">Hugging Face Hub</p></div><div class="bg-black/30 border border-white/10 rounded-xl p-4"><p class="text-[10px] tracking-widest text-gray-400">BATTLE ENGINE</p><p class="title-font text-sm text-fuchsia-200 mt-1">Visual simulation</p></div><div class="bg-black/30 border border-white/10 rounded-xl p-4"><p class="text-[10px] tracking-widest text-gray-400">REAL AI INFERENCE</p><p class="title-font text-sm text-amber-200 mt-1">Phase 2 · not connected</p></div></div></div>
+</section>
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"><div><h2 class="title-font text-lg md:text-xl text-cyan-200 font-bold">MODEL EXPLORER</h2><p class="text-sm text-gray-400 mt-1">Public catalogue entries with cinematic avatar representations.</p><p id="catalogue-status" class="data-note mt-1">Showing seed entries. Select “Refresh public data” to query the live public catalogue.</p></div><div class="bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-xs font-mono"><span class="text-gray-500">CATALOGUE ENTRIES</span> <strong id="stat-total" class="text-cyan-300 ml-2">0</strong></div></section>
+<div id="tier-container" class="space-y-8"></div>
+<section class="border border-amber-300/20 bg-amber-950/10 rounded-2xl p-5"><h3 class="font-bold text-amber-200">Data integrity note</h3><p class="data-note mt-2">Public catalogue metadata is not proof of model quality. Download counts and likes are popularity signals, not benchmark scores. Robot designs, combat animations and simulated winners are fictional entertainment. The public catalogue refresh requires an internet connection and may be rate-limited.</p></section>
+</main>
+<div id="spec-modal" role="dialog" aria-modal="true" aria-labelledby="spec-name" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4"><div class="border rounded-2xl max-w-2xl w-full p-6 relative max-h-[90vh] overflow-y-auto"><button type="button" onclick="closeModal('spec-modal')" aria-label="Close model details" class="absolute top-4 right-4 text-gray-400 text-xl">✕</button><div class="flex flex-col md:flex-row gap-6"><div id="spec-visual" class="w-full md:w-1/2 rounded-xl p-6 flex flex-col items-center justify-center pedestal"></div><div class="w-full md:w-1/2 space-y-4"><div id="spec-company" class="text-xs text-cyan-300 font-bold tracking-widest uppercase">MODEL SOURCE</div><h3 id="spec-name" class="title-font text-2xl font-black">MODEL</h3><span id="spec-tier" class="inline-block px-2 py-1 text-xs rounded">VISUAL ARCHETYPE</span><div class="text-xs space-y-3"><div><div class="flex justify-between text-gray-400"><span>VERIFIED SCORE</span><span id="spec-power-num">Not ranked</span></div><div class="w-full bg-gray-800 h-2 rounded mt-2"><div id="spec-power-bar" class="bg-cyan-400 h-full"></div></div></div><div class="grid grid-cols-2 gap-2"><div class="bg-gray-950 p-2 rounded"><span class="text-gray-500 block">MODEL / VERSION</span><span id="spec-version" class="text-gray-200">-</span></div><div class="bg-gray-950 p-2 rounded"><span class="text-gray-500 block">CONTEXT</span><span id="spec-context" class="text-gray-200">See provider</span></div></div><p id="spec-desc" class="bg-gray-950 p-3 rounded text-gray-300 leading-relaxed"></p></div><button type="button" onclick="closeModal('spec-modal')" class="w-full border border-cyan-500/30 py-2 rounded text-xs font-bold">CLOSE PROFILE</button></div></div></div></div>
+<div id="arena-modal" role="dialog" aria-modal="true" aria-labelledby="arena-title" class="fixed inset-0 bg-black/90 backdrop-blur-lg hidden z-50 flex items-center justify-center p-3 md:p-5"><div class="border rounded-2xl max-w-4xl w-full p-5 md:p-7 relative max-h-[94vh] overflow-y-auto"><button type="button" onclick="closeModal('arena-modal')" aria-label="Close battle arena" class="absolute top-4 right-4 text-gray-400 text-xl z-10">✕</button><div class="text-center mb-5"><p class="text-[10px] tracking-[.3em] text-pink-300">SIMULATION MODE · NO AI API CALLS</p><h3 id="arena-title" class="title-font text-xl md:text-2xl font-black text-fuchsia-300 mt-2">CINEMATIC COMBAT ARENA</h3><p class="text-xs text-gray-400 mt-2">Fictional robot choreography. Winner is randomly selected; this is not an AI capability test.</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5"><div class="bg-gray-900 p-3 rounded-lg border border-cyan-900"><label for="fighter-a-select" class="block text-xs text-cyan-300 font-bold mb-2">BLUE CORNER</label><select id="fighter-a-select" onchange="updateFighterDisplay('a')" class="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-xs text-white"></select></div><div class="bg-gray-900 p-3 rounded-lg border border-pink-900"><label for="fighter-b-select" class="block text-xs text-pink-300 font-bold mb-2">RED CORNER</label><select id="fighter-b-select" onchange="updateFighterDisplay('b')" class="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-xs text-white"></select></div></div><div id="battle-ring" class="relative rounded-xl p-4 md:p-6 min-h-[220px] flex items-center justify-between mb-5 overflow-hidden"><div id="fighter-a-stage" class="flex flex-col items-center transition-all"></div><div class="flex flex-col items-center px-2"><div class="text-3xl font-black title-font text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-pink-400">VS</div><div id="combat-status" class="text-[10px] text-gray-400 mt-2 text-center font-mono">SIMULATION STANDBY</div></div><div id="fighter-b-stage" class="flex flex-col items-center transition-all"></div></div><button id="fight-btn" type="button" onclick="executeBattle()" class="w-full bg-gradient-to-r from-fuchsia-600 via-pink-600 to-amber-500 text-white font-black py-3 rounded-xl title-font tracking-widest text-sm">START SIMULATED COMBAT</button><div class="bg-gray-900 p-3 rounded-lg border border-gray-800 mt-4"><div class="text-[10px] text-cyan-300 font-bold tracking-widest mb-2">COMBAT LOG</div><div id="combat-log" aria-live="polite" class="text-xs font-mono text-gray-300 min-h-20 max-h-36 overflow-y-auto space-y-1 bg-gray-950 p-3 rounded"><p class="text-gray-500 italic">Choose two avatars to begin.</p></div></div></div></div>
+<footer class="border-t border-cyan-900/30 py-5 px-4 text-center text-xs text-gray-500">AI-VERSE · Public model metadata + fictional robot simulation · Independent fan project, not affiliated with AI providers.</footer>
+<script src="script.js" defer></script>
+</body></html>
