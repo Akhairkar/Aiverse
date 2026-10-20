@@ -19,7 +19,7 @@ function buildMech(model){
  const dark=new THREE.MeshStandardMaterial({color:0x111923,metalness:.82,roughness:.34});
  const accentMat=new THREE.MeshStandardMaterial({color:accent,emissive:accent,emissiveIntensity:1.05,metalness:.48,roughness:.2});
  const rubber=new THREE.MeshStandardMaterial({color:0x090d12,metalness:.25,roughness:.8});
- const addBox=(parent,x,y,z,sx,sy,sz,mat,bevel=0)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh};
+ const addBox=(parent,x,y,z,sx,sy,sz,mat,bevel=.035)=>{const geom=(THREE.RoundedBoxGeometry&&bevel>0)?new THREE.RoundedBoxGeometry(sx,sy,sz,3,Math.min(bevel,Math.min(sx,sy,sz)*.22)):new THREE.BoxGeometry(sx,sy,sz);const mesh=new THREE.Mesh(geom,mat);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh};
  const addCyl=(parent,x,y,z,r1,r2,len,mat,rx=0,rz=0)=>{const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,len,12,1),mat);mesh.position.set(x,y,z);mesh.rotation.x=rx;mesh.rotation.z=rz;mesh.castShadow=true;parent.add(mesh);return mesh};
  const addJoint=(x,y,z,r=.13)=>{addCyl(group,x,y,z,r,r,.16,dark,Math.PI/2);addCyl(group,x,y,z+.09,r*.58,r*.58,.035,bright,Math.PI/2)};
  // legs: piston cores, overlapping armour, broad boots
@@ -53,6 +53,26 @@ function buildMech(model){
   addBox(group,side*.64,-.29,.02,.21,.28,.22,bright);
   addBox(group,side*.64,-.3,.145,.13,.16,.04,dark);
   addBox(group,side*.64,-.3,.17,.065,.07,.025,accentMat);
+ }
+ // layered shoulder silhouette, segmented thigh plates and functional-looking vents
+ for(const side of [-1,1]){
+  const shoulder=addBox(group,side*.61,.34,-.015,.31,.16,.35,bright,.045);
+  shoulder.rotation.z=side*-.12;
+  addBox(group,side*.61,.39,.16,.22,.045,.045,accentMat,.012);
+  // layered hip guards and front knee actuator covers
+  addBox(group,side*.35,-.42,.205,.25,.13,.09,dark,.025);
+  addBox(group,side*.35,-.43,.258,.15,.035,.018,bright,.008);
+  // exposed circular joint collars
+  const collar=new THREE.Mesh(new THREE.TorusGeometry(.115,.022,8,24),bright);
+  collar.position.set(side*.34,-.39,.11);collar.rotation.x=Math.PI/2;group.add(collar);
+ }
+ // precision vent stack and recessed torso fasteners
+ for(let i=0;i<5;i++){
+  addBox(group,-.13+i*.065,-.015,.292,.025,.12,.018,dark,.006);
+ }
+ for(const side of [-1,1]){
+  const bolt=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,.018,12),bright);
+  bolt.rotation.x=Math.PI/2;bolt.position.set(side*.39,.32,.303);group.add(bolt);
  }
  // neck stack and angular helmet
  addCyl(group,0,.48,0,.12,.14,.2,dark);
