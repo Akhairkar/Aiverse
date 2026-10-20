@@ -24,3 +24,13 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-
 .data-note{color:#8ea5bb;font-size:12px;line-height:1.5}
 @media(max-width:640px){header{position:relative!important}.model-card{min-height:280px}.model-card .pedestal{min-height:165px}#battle-ring{padding:12px;gap:4px}#battle-ring .mech-render{max-width:110px;height:auto}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+/* Procedural real-time 3D mech viewer */
+.robot-3d{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:230px;min-height:170px;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 50% 72%,#17304588,transparent 58%);border-radius:12px}
+.robot-3d canvas{display:block;width:100%;height:100%;outline:none}
+.robot-loading{position:absolute;inset:0;display:grid;place-items:center;color:#7192a8;font:10px monospace;letter-spacing:.15em}
+.model-card .pedestal{min-height:245px}
+#spec-visual .robot-3d{height:360px;max-height:48vh}
+#fighter-a-stage .robot-3d,#fighter-b-stage .robot-3d{width:min(100%,200px);height:190px;min-height:150px}
+#battle-ring{background:radial-gradient(ellipse at center,#17283b 0%,#080d18 65%)!important}
+@media(max-width:640px){.robot-3d{height:200px}.model-card .pedestal{min-height:210px}#fighter-a-stage .robot-3d,#fighter-b-stage .robot-3d{width:130px;height:150px;min-height:120px}#spec-visual .robot-3d{height:290px}}
