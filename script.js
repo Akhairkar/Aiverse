@@ -152,17 +152,52 @@ function mountRobotScene(host){
  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
  renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  renderer.setClearColor(0x000000,0);host.replaceChildren(renderer.domElement);
- const ambient=new THREE.HemisphereLight(0xc7e7ff,0x10141d,1.45);scene.add(ambient);
- const key=new THREE.DirectionalLight(0xffffff,3.0);key.position.set(3,4,4);key.castShadow=true;scene.add(key);
+ const ambient=new THREE.HemisphereLight(0xc7e7ff,0x10141d,1.65);scene.add(ambient);
+ const key=new THREE.DirectionalLight(0xffffff,3.2);key.position.set(3,4,4);key.castShadow=true;scene.add(key);
  const rim=new THREE.PointLight(new THREE.Color(model.color||'#73e7ff'),3.1,8);rim.position.set(-2,1.6,-1.5);scene.add(rim);
+ const fill=new THREE.PointLight(0x6f9dff,1.4,7);fill.position.set(2,.5,-2);scene.add(fill);
  const floor=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.35,.12,48),new THREE.MeshStandardMaterial({color:0x0c1722,metalness:.8,roughness:.3}));
  floor.position.y=-1.04;floor.receiveShadow=true;scene.add(floor);
  const ring=new THREE.Mesh(new THREE.TorusGeometry(.85,.012,8,64),new THREE.MeshBasicMaterial({color:new THREE.Color(model.color||'#73e7ff'),transparent:true,opacity:.45}));ring.rotation.x=Math.PI/2;ring.position.y=-.97;scene.add(ring);
- const mech=buildMech(model);mech.scale.setScalar(.93);scene.add(mech);
+ let mech=null,mixer=null,usingExternal=false,frame=0;
+ const fallback=()=>{if(mech)return;mech=buildMech(model);mech.scale.setScalar(.93);scene.add(mech)};
+ // CC0 mecha assets by Ramon Linares; animations are embedded in the GLB.
+ // Use distinct industrial frames by class; fallback keeps the site usable if the asset host is offline.
+ const frameByTier={TITAN:'atlas-09',WARRIOR:'ronin-04',SCOUT:'aether-02'};
+ const frameName=frameByTier[model.tier]||'atlas-09';
+ const assetUrl='https://ramonlinares.github.io/atlas-09/models/'+frameName+'.glb';
+ const loadExternal=()=>new Promise((resolve,reject)=>{
+  if(!THREE.GLTFLoader){reject(new Error('GLTFLoader unavailable'));return}
+  new THREE.GLTFLoader().load(assetUrl,gltf=>{
+   try{
+    const object=gltf.scene;
+    const bounds=new THREE.Box3().setFromObject(object);
+    const size=bounds.getSize(new THREE.Vector3());
+    const center=bounds.getCenter(new THREE.Vector3());
+    if(!Number.isFinite(size.y)||size.y<0.01)throw new Error('Invalid model bounds');
+    object.scale.setScalar(1.78/size.y);
+    object.position.set(-center.x*object.scale.x,-bounds.min.y*object.scale.y-.98,-center.z*object.scale.z);
+    object.traverse(node=>{if(node.isMesh){node.castShadow=true;node.receiveShadow=true;if(node.material){const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>{if(mat.metalness!==undefined)mat.metalness=Math.min(1,Math.max(mat.metalness,.35));if(mat.roughness!==undefined)mat.roughness=Math.min(1,Math.max(mat.roughness,.24));});}}});
+    scene.add(object);mech=object;usingExternal=true;
+    if(gltf.animations&&gltf.animations.length){mixer=new THREE.AnimationMixer(object);const preferred=gltf.animations.find(a=>/idle|stand|sentinel/i.test(a.name))||gltf.animations[0];mixer.clipAction(preferred).play();}
+    resolve();
+   }catch(e){reject(e)}
+  },undefined,reject);
+ });
  const resize=()=>{const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()};
  resize();const observer=new ResizeObserver(resize);observer.observe(host);
- let frame=0;const animate=()=>{if(!host.isConnected){observer.disconnect();renderer.dispose();robotRenderers.delete(host);return}frame++;mech.rotation.y=-.13+Math.sin(frame*.006)*.14;renderer.render(scene,camera);if(frame%3===0)requestAnimationFrame(animate);else requestAnimationFrame(animate)};
- robotRenderers.set(host,{renderer,scene,camera,mech,observer});requestAnimationFrame(animate);
+ const clock=new THREE.Clock();
+ const animate=()=>{
+  if(!host.isConnected){observer.disconnect();renderer.dispose();robotRenderers.delete(host);return}
+  const delta=Math.min(clock.getDelta(),.05);frame++;
+  if(mixer)mixer.update(delta);
+  if(mech&&!usingExternal)mech.rotation.y=-.13+Math.sin(frame*.006)*.14;
+  else if(mech&&usingExternal&&!mixer)mech.rotation.y=Math.sin(frame*.004)*.08;
+  renderer.render(scene,camera);requestAnimationFrame(animate);
+ };
+ robotRenderers.set(host,{renderer,scene,camera,observer});
+ loadExternal().catch(()=>{fallback();const note=host.querySelector('.robot-loading');if(note)note.textContent='PROCEDURAL FALLBACK'});
+ requestAnimationFrame(animate);
 }
 function renderRobotScenes(root=document){if(!window.THREE)return;root.querySelectorAll('.robot-3d').forEach(mountRobotScene)}
 
